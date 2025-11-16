@@ -29,16 +29,6 @@ model = load_model()
 # ----------------------------#
 # Helper Functions
 # ----------------------------#
-def find_available_cameras(max_tested=5):
-    available = []
-    for i in range(max_tested):
-        cap = cv2.VideoCapture(i)
-        if cap.isOpened() and cap.read()[0]:
-            available.append(i)
-        cap.release()
-    return available
-
-available_cams = find_available_cameras()
 def detect_objects(uploaded_file, source_type="image"):
     """
     Run YOLO detection on an image or video.
@@ -67,28 +57,26 @@ def detect_objects(uploaded_file, source_type="image"):
         st.success("✅ Video detection complete!")
 
     elif source_type == "webcam":
-        if len(available_cams) ==0:
-            st.write("No Available Cam detected")
-        else:
-            st.info("🎥 Starting live detection... Press Stop to end.")
-            run = st.checkbox("▶️ Run Webcam", value=True)
-            cap = cv2.VideoCapture(available_cams[0])
-            stframe = st.empty()
-    
-            while run and cap.isOpened():
-                ret, frame = cap.read()
-                if not ret:
-                    st.warning("No camera feed detected.")
-                    break
-    
-                results = model.predict(frame, conf=0.5)
-                annotated_frame = results[0].plot()
-                stframe.image(annotated_frame, channels="BGR", use_container_width=True)
-    
-                time.sleep(0.003)  # small delay to avoid CPU overload
-    
-            cap.release()
-            st.success("✅ Live detection ended.")
+        st.info("🎥 Starting live detection... Press Stop to end.")
+        run = st.checkbox("▶️ Run Webcam", value=True)
+        cap = cv2.VideoCapture(0)
+        FRAME_WINDOW = st.image([])
+        stframe = st.empty()
+
+        while run and cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                st.warning("No camera feed detected.")
+                break
+
+            results = model.predict(frame, conf=0.5)
+            annotated_frame = results[0].plot()
+            FRAME_WINDOW.image(annotated_frame, channels="BGR", use_container_width=True)
+
+            time.sleep(0.003)  # small delay to avoid CPU overload
+
+        cap.release()
+        st.success("✅ Live detection ended.")
 
 # ============================================
 
