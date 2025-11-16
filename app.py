@@ -59,7 +59,7 @@ def detect_objects(uploaded_file, source_type="image"):
     elif source_type == "webcam":
         st.info("🎥 Starting live detection... Press Stop to end.")
         run = st.checkbox("▶️ Run Webcam", value=True)
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(1)
         stframe = st.empty()
 
         while run and cap.isOpened():
