@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 from ultralytics import YOLO
 import tempfile
 import os
@@ -29,6 +30,22 @@ model = load_model()
 # ----------------------------#
 # Helper Functions
 # ----------------------------#
+class YOLOVideoTransformer(VideoTransformerBase):
+    
+    def transform(self, frame):
+        # Convert WebRTC frame → OpenCV BGR array
+        img = frame.to_ndarray(format="bgr24")
+
+        # Run YOLO prediction
+        results = model.predict(img, conf=0.5)
+
+        # Draw bounding boxes (Ultralytics built-in)
+        plotted = results[0].plot()  
+
+        # Return frame
+        return plotted
+
+
 def detect_objects(uploaded_file, source_type="image"):
     """
     Run YOLO detection on an image or video.
@@ -61,19 +78,19 @@ def detect_objects(uploaded_file, source_type="image"):
         run = st.checkbox("▶️ Run Webcam", value=True)
         cap = cv2.VideoCapture(0)
         FRAME_WINDOW = st.image([])
-        stframe = st.empty()
+        # stframe = st.empty()
 
         while run and cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                st.warning("No camera feed detected.")
-                break
-
-            results = model.predict(frame, conf=0.5)
-            annotated_frame = results[0].plot()
-            FRAME_WINDOW.image(annotated_frame, channels="BGR", use_container_width=True)
-
-            time.sleep(0.003)  # small delay to avoid CPU overload
+            # WebRTC stream
+            webrtc_streamer(
+                key="yolo_stream",
+                video_processor_factory=YOLOVideoTransformer,
+                media_stream_constraints={"video": True, "audio": False},
+                async_processing=True,
+                rtc_configuration={
+                    "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+                }
+            )
 
         cap.release()
         st.success("✅ Live detection ended.")
