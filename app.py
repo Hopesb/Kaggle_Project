@@ -74,23 +74,16 @@ def detect_objects(uploaded_file, source_type="image"):
         st.success("✅ Video detection complete!")
 
     elif source_type == "webcam":
-        st.info("🎥 Starting live detection... Press Stop to end.")
-        run = st.checkbox("▶️ Run Webcam", value=True)
-
-        while run:
-            # WebRTC stream
-            webrtc_streamer(
-                key="yolo_stream",
-                video_processor_factory=YOLOVideoTransformer,
-                media_stream_constraints={"video": True, "audio": False},
-                async_processing=True,
-                rtc_configuration={
-                    "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-                }
-            )
-
-        cap.release()
-        st.success("✅ Live detection ended.")
+        # WebRTC stream
+        webrtc_streamer(
+            key="yolo_stream",
+            video_processor_factory=YOLOVideoTransformer,
+            media_stream_constraints={"video": True, "audio": False},
+            async_processing=True,
+            rtc_configuration={
+                "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+            }
+        )
 
 # ============================================
 
