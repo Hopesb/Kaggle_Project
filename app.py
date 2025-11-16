@@ -67,7 +67,7 @@ def detect_objects(uploaded_file, source_type="image"):
         st.success("✅ Video detection complete!")
 
     elif source_type == "webcam":
-        if len(available_cam) ==0:
+        if len(available_cams) ==0:
             st.write("No Available Cam detected")
         else:
             st.info("🎥 Starting live detection... Press Stop to end.")
