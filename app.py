@@ -77,7 +77,7 @@ def detect_objects(uploaded_file, source_type="image"):
         st.info("🎥 Starting live detection... Press Stop to end.")
         run = st.checkbox("▶️ Run Webcam", value=True)
 
-        while run and cap.isOpened():
+        while run:
             # WebRTC stream
             webrtc_streamer(
                 key="yolo_stream",
