@@ -4,9 +4,3 @@ numpy
 opencv-python==4.12.0.88
 pillow
 streamlit_webrtc
-libglib2.0-0
-libsm6
-libxext6
-libxrender-dev
-libgomp1
-libgl1   # <-- instead of libgl1-mesa-glx
